@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fed Rate Control Panel</title>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .current-rate {
+            text-align: center;
+            background: #e3f2fd;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .rate-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 10px 0;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .normal { background: #2196f3; color: white; }
+        .trigger { background: #ff9800; color: white; }
+        .high { background: #f44336; color: white; }
+        .cut { background: #4caf50; color: white; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .update-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .api-info {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        .history {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .manual-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Federal Reserve Rate Control Panel</h1>
+        <p><strong>Classroom Demonstration Tool</strong></p>
+        
+        <div class="current-rate">
+            <div>Current Federal Reserve Rate</div>
+            <div class="rate-display" id="currentRate">5.25%</div>
+            <div id="lastUpdated">Last Updated: Loading...</div>
+        </div>
+
+        <div class="api-info">
+            <strong>📡 Smart Contract API Endpoint:</strong><br>
+            <code id="apiEndpoint">https://YOUR-USERNAME.github.io/fed-rate-demo/fed-rate.json</code>
+        </div>
+
+        <div class="update-info">
+            <strong>⚡ How to Update Rates:</strong><br>
+            1. Click a preset button below, OR<br>
+            2. Enter custom rate and click "Update Rate"<br>
+            3. Edit the JSON file in your GitHub repository<br>
+            4. Smart contract will detect the change automatically
+        </div>
+
+        <h3>🎯 Quick Rate Changes (Class Demonstration)</h3>
+        <div class="controls">
+            <button class="normal" onclick="showUpdateInstructions(525, '5.25% - Normal Rate')">
+                5.25%<br><small>Normal Rate</small>
+            </button>
+            <button class="trigger" onclick="showUpdateInstructions(575, '5.75% - Triggers Compensation (+0.5%)')">
+                5.75%<br><small>🎯 Triggers Compensation</small>
+            </button>
+            <button class="high" onclick="showUpdateInstructions(625, '6.25% - High Trigger (+1.0%)')">
+                6.25%<br><small>🔥 High Trigger</small>
+            </button>
+            <button class="cut" onclick="showUpdateInstructions(475, '4.75% - Rate Cut (-0.5%)')">
+                4.75%<br><small>📉 Rate Cut</small>
+            </button>
+        </div>
+
+        <h3>✏️ Manual Rate Entry</h3>
+        <div class="manual-control">
+            <input type="number" id="customRate" placeholder="Enter rate (basis points, e.g., 575)" min="0" max="2000">
+            <button class="normal" onclick="setCustomRate()">Update Rate</button>
+        </div>
+
+        <div class="history">
+            <h3>📊 Rate Change History</h3>
+            <div id="historyLog">Loading history...</div>
+        </div>
+
+        <div class="update-info">
+            <strong>🔄 Students Will See:</strong><br>
+            • Smart contract detects rate change automatically<br>
+            • Compensation calculated and sent to student wallets<br>
+            • Blockchain transaction recorded permanently<br>
+            • All happens without human intervention!
+        </div>
+    </div>
+
+    <script>
+        let currentRateData = { current_rate: 525, rate_percent: 5.25 };
+
+        // Load current rate data
+        async function loadCurrentRate() {
+            try {
+                const response = await fetch('./fed-rate.json?t=' + Date.now());
+                const data = await response.json();
+                currentRateData = data;
+                
+                document.getElementById('currentRate').textContent = data.rate_percent.toFixed(2) + '%';
+                document.getElementById('lastUpdated').textContent = 'Last Updated: ' + new Date(data.last_updated).toLocaleString();
+                
+                // Update history
+                if (data.change_log) {
+                    const historyHtml = data.change_log.slice(-5).reverse().map(entry => 
+                        `<div><strong>${(entry.rate/100).toFixed(2)}%</strong> - ${entry.change >= 0 ? '+' : ''}${entry.change/100}% - ${new Date(entry.timestamp).toLocaleString()}</div>`
+                    ).join('');
+                    document.getElementById('historyLog').innerHTML = historyHtml;
+                }
+            } catch (error) {
+                console.log('Loading from default values');
+            }
+        }
+
+        function showUpdateInstructions(newRate, description) {
+            const ratePercent = (newRate / 100).toFixed(2);
+            const currentPercent = (currentRateData.current_rate / 100).toFixed(2);
+            const change = ((newRate - currentRateData.current_rate) / 100).toFixed(2);
+            const triggersCompensation = Math.abs(newRate - currentRateData.current_rate) >= 50;
+            
+            alert(`🎯 UPDATE INSTRUCTIONS FOR: ${description}
+
+STEP 1: Go to your GitHub repository
+STEP 2: Edit the file 'fed-rate.json'
+STEP 3: Change the values to:
+
+"current_rate": ${newRate},
+"rate_percent": ${ratePercent},
+"last_updated": "${new Date().toISOString()}"
+
+STEP 4: Commit the changes
+
+📊 RATE CHANGE SUMMARY:
+- From: ${currentPercent}% → To: ${ratePercent}%
+- Change: ${change >= 0 ? '+' : ''}${change}%
+- Triggers Student Compensation: ${triggersCompensation ? 'YES! 🎉' : 'No'}
+
+Students will see their wallets update automatically!`);
+        }
+
+        function setCustomRate() {
+            const customRate = parseInt(document.getElementById('customRate').value);
+            if (customRate && customRate >= 0 && customRate <= 2000) {
+                showUpdateInstructions(customRate, `Custom Rate: ${(customRate/100).toFixed(2)}%`);
+            } else {
+                alert('Please enter a valid rate between 0 and 2000 basis points (0% to 20%)');
+            }
+        }
+
+        // Load rate on page load and refresh every 30 seconds
+        loadCurrentRate();
+        setInterval(loadCurrentRate, 30000);
+
+        // Update API endpoint display
+        document.getElementById('apiEndpoint').textContent = window.location.origin + window.location.pathname.replace('index.html', '') + 'fed-rate.json';
+    </script>
+</body>
+</html>
