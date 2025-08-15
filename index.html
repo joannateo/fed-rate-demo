@@ -199,8 +199,8 @@ Students will see their wallets update automatically!`);
         }
 
         function setCustomRate() {
-            const customRate = parseInt(document.getElementById('customRate').value);
-            if (customRate && customRate >= 0 && customRate <= 2000) {
+            const customRate = parseInt(document.getElementById('customRate').value, 10);
+            if (!Number.isNaN(customRate) && customRate >= 0 && customRate <= 2000) {
                 showUpdateInstructions(customRate, `Custom Rate: ${(customRate/100).toFixed(2)}%`);
             } else {
                 alert('Please enter a valid rate between 0 and 2000 basis points (0% to 20%)');
