@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 /**
- * @title FedRateProtection - JSON-Referenced Version
+ * @title FedRateProtection
  * @dev Smart Contract that references external JSON data source without Chainlink
  * 
  * 🎯 LEARNING OBJECTIVE: Understand external data integration and oracle concepts
@@ -18,7 +18,7 @@ pragma solidity ^0.8.19;
  * 🌐 JSON SOURCE: https://joannateo.github.io/fed-rate-demo/fed-rate.json
  */
 
-contract FedRateProtectionJSONReferenced {
+contract FedRateProtection {
     
     // 📊 STUDENT CUSTOMIZABLE PARAMETERS
     // ═══════════════════════════════════════════════════════════════
@@ -37,7 +37,7 @@ contract FedRateProtectionJSONReferenced {
     // 🌐 JSON DATA SOURCE REFERENCE
     string public constant JSON_DATA_SOURCE = "https://joannateo.github.io/fed-rate-demo/fed-rate.json";
     string public constant JSON_FIELD_NAME = "current_rate";
-    string public constant DATA_FORMAT = "Percentage (e.g., 5.25 for 5.25%)";
+    string public constant DATA_FORMAT = "Percentage (e.g., 4.50 for 5.00%)";
     uint256 public lastOracleUpdate;        // When was the rate last updated
     bool public oracleActive;               // Is the oracle currently active
     uint256 public oracleUpdateCount;       // How many times oracle has provided data
@@ -165,7 +165,7 @@ contract FedRateProtectionJSONReferenced {
         compensationRate = _compensationRate;
         
         // Initialize with Fed rate (instructor will update from JSON)
-        currentFedRate = 525;                       // Start at 5.25%
+        currentFedRate = 450;                       // Start at 4.50%
         baselineRate = currentFedRate;
         oracleActive = true;
         
@@ -305,7 +305,7 @@ contract FedRateProtectionJSONReferenced {
      * 
      * 🎓 EDUCATIONAL: Explains why oracles are needed and how they work
      */
-    function explainOracleProcess() external view returns (
+    function explainOracleProcess() external pure returns (
         string memory why,
         string memory how,
         string memory production,
@@ -329,59 +329,58 @@ contract FedRateProtectionJSONReferenced {
      * 🌐 JSON: Data comes from your external JSON source
      */
     function checkAndTriggerCompensation(uint256 oldRate, uint256 newRate) internal {
-        // 🔍 CRITICAL CHECK: Only trigger if rate increase exceeds YOUR threshold
-        if (newRate > baselineRate + triggerThreshold) {
-            
-            // Calculate compensation: YOUR compensation rate * original loan amount
-            uint256 compensationAmount = (loanAmount * compensationRate) / 10000;
-            
-            // Convert to wei for actual ETH transfer
-            uint256 compensationInWei = compensationAmount * 1e12;
-            
-            // Check contract balance
-            require(address(this).balance >= compensationInWei, "Insufficient contract balance");
-            
-            // 💰 EXECUTE THE PAYMENT AUTOMATICALLY
-            payable(client).transfer(compensationInWei);
-            
-            // Update state
-            totalCompensationPaid += compensationInWei;
-            compensationCount++;
-            
-            // Record the event with JSON source reference
-            compensationHistory.push(CompensationEvent({
-                timestamp: block.timestamp,
-                oldRate: oldRate,
-                newRate: newRate,
-                rateIncrease: newRate - baselineRate,
-                compensationAmount: compensationInWei,
-                dataSource: JSON_DATA_SOURCE
-            }));
-            
-            emit CompensationTriggered(
-                client, 
-                oldRate, 
-                newRate, 
-                compensationInWei, 
-                string(abi.encodePacked("Data from: ", JSON_DATA_SOURCE))
-            );
-            
-            // Update baseline for future calculations
-            baselineRate = newRate;
-            
-        } else {
-            // 📊 IMPORTANT: Show when compensation does NOT trigger
-            emit CompensationNotTriggered(
-                newRate,
-                baselineRate,
-                triggerThreshold,
-                string(abi.encodePacked(
-                    "Rate increase of ", toString(newRate > baselineRate ? newRate - baselineRate : 0), 
-                    " basis points is below YOUR threshold of ", toString(triggerThreshold), " basis points"
-                ))
-            );
-        }
+    // 🔍 CRITICAL CHECK: Only trigger if rate increase exceeds YOUR threshold
+    if (newRate > baselineRate + triggerThreshold) {
+        // Calculate compensation: YOUR compensation rate * original loan amount
+        uint256 compensationAmount = (loanAmount * compensationRate) / 10000;
+
+        // Convert to wei for actual ETH transfer
+        uint256 compensationInWei = compensationAmount * 1e12;
+
+        // Check contract balance
+        require(address(this).balance >= compensationInWei, "Insufficient contract balance");
+
+        // 💰 EXECUTE THE PAYMENT AUTOMATICALLY
+        (bool success, ) = payable(client).call{value: compensationInWei}("");
+        require(success, "Transfer failed");
+
+        // Update state
+        totalCompensationPaid += compensationInWei;
+        compensationCount++;
+
+        // Record the event with JSON source reference
+        compensationHistory.push(CompensationEvent({
+            timestamp: block.timestamp,
+            oldRate: oldRate,
+            newRate: newRate,
+            rateIncrease: newRate - baselineRate,
+            compensationAmount: compensationInWei,
+            dataSource: JSON_DATA_SOURCE
+        }));
+
+        emit CompensationTriggered(
+            client,
+            oldRate,
+            newRate,
+            compensationInWei,
+            string(abi.encodePacked("Data from: ", JSON_DATA_SOURCE))
+        );
+
+        // Update baseline for future calculations
+        baselineRate = newRate;
+    } else {
+        // 📊 IMPORTANT: Show when compensation does NOT trigger
+        emit CompensationNotTriggered(
+            newRate,
+            baselineRate,
+            triggerThreshold,
+            string(abi.encodePacked(
+                "Rate increase of ", toString(newRate > baselineRate ? newRate - baselineRate : 0),
+                " basis points is below YOUR threshold of ", toString(triggerThreshold), " basis points"
+            ))
+        );
     }
+}
     
     // 📊 STUDENT ANALYSIS FUNCTIONS
     // ═══════════════════════════════════════════════════════════════
@@ -559,7 +558,7 @@ contract FedRateProtectionJSONReferenced {
 🌐 JSON-REFERENCED SMART CONTRACT FEATURES:
 
 1. EXPLICIT JSON INTEGRATION:
-   ✅ Contract stores your JSON URL as a constant
+   ✅ Contract stores the JSON URL as a constant
    ✅ All events reference the JSON data source
    ✅ Students can verify updates against public JSON
    ✅ Clear educational connection to external data
@@ -578,15 +577,15 @@ contract FedRateProtectionJSONReferenced {
 
 4. DEMONSTRATION BENEFITS:
    ✅ No external dependencies (Chainlink, LINK tokens)
-   ✅ Students can independently verify your updates
+   ✅ Students can independently verify the rates updates
    ✅ Clear connection between JSON changes and contract updates
    ✅ Perfect for explaining oracle problem and solutions
 
 5. DEMO FLOW:
    1. Students deploy contracts (reference JSON in events)
-   2. You show JSON endpoint with current rate
-   3. You change demo website, JSON updates
-   4. You call updateFromJSONSource(575)
+   2. Instructor show JSON endpoint with current rate
+   3. Instructor change demo website, JSON updates
+   4. Instructor call updateFromJSONSource(575)
    5. Students verify the update matches JSON
    6. Compensation triggers based on individual thresholds
    7. Students see verifiable external data integration
