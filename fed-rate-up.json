@@ -1,0 +1,20 @@
+{
+  "current_rate": 575,
+  "rate_percent": 5.75,
+  "last_updated": "2025-08-19T14:30:00Z",
+  "status": "active",
+  "change_log": [
+    {
+      "timestamp": "2025-01-15T09:00:00Z",
+      "rate": 525,
+      "change": 0,
+      "note": "Class started - baseline rate"
+    },
+    {
+      "timestamp": "2025-08-19T14:30:00Z",
+      "rate": 575,
+      "change": 50,
+      "note": "Live demo - rate increase triggers compensation"
+    }
+  ]
+}
