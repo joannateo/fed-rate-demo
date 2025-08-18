@@ -1,13 +1,24 @@
 {
-  "current_rate": 450,
-  "rate_percent": 4.50,
+  "current_rate": 4.50,
+  "previous_rate": 4.50,
+  "effective_date": "2025-07-19T09:00:00Z",
+  "previous_date": "2025-07-19T09:00:00Z",
+  "change_basis_points": 0,
+  "change_percentage": 0,
   "last_updated": "2025-07-19T09:00:00Z",
-  "change_log": [
+  "source": "Federal Reserve Demo",
+  "rate_history": [
     {
-      "timestamp": "2025-07-19T09:00:00Z",
-      "rate": 450,
-      "change": 0,
-      "note": "Class started - baseline rate"
+      "rate": 4.50,
+      "date": "2025-07-19T09:00:00Z",
+      "change_bps": 0,
+      "change_pct": 0,
+      "note": "Initial baseline rate"
     }
-  ]
+  ],
+  "oracle_metadata": {
+    "contract_compatible": true,
+    "format_version": "1.1",
+    "update_frequency": "on_demand"
+  }
 }
