@@ -1,11 +1,10 @@
 {
   "current_rate": 525,
   "rate_percent": 5.25,
-  "last_updated": "2025-01-15T10:30:00Z",
-  "status": "active",
+  "last_updated": "2025-01-15T09:00:00Z",
   "change_log": [
     {
-      "timestamp": "2025-01-15T09:00:00Z",
+      "timestamp": "2025-08-19T09:00:00Z",
       "rate": 525,
       "change": 0,
       "note": "Class started - baseline rate"
