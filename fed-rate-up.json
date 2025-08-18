@@ -1,6 +1,6 @@
 {
-  "current_rate": 575,
-  "rate_percent": 5.75,
+  "current_rate": 480,
+  "rate_percent": 4.80,
   "last_updated": "2025-08-19T14:30:00Z",
   "status": "active",
   "change_log": [
@@ -12,9 +12,9 @@
     },
     {
       "timestamp": "2025-08-19T14:30:00Z",
-      "rate": 575,
-      "change": 50,
-      "note": "Live demo - rate increase triggers compensation"
+      "rate": 480,
+      "change": 30,
+      "note": "Live demo - rate increase without triggers compensation"
     }
   ]
 }
