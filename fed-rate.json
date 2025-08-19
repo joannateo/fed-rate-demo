@@ -1,11 +1,11 @@
 {
-  "current_rate": 4.75,
+  "current_rate": 4.5,
   "previous_rate": 4.5,
-  "effective_date": "2025-08-18T21:01:00.000Z",
+  "effective_date": "2025-07-19T01:00:00.000Z",
   "previous_date": "2025-07-19T01:00:00.000Z",
-  "change_basis_points": 25,
-  "change_percentage": 5.56,
-  "last_updated": "2025-08-18T21:01:37.256Z",
+  "change_basis_points": 0,
+  "change_percentage": 0,
+  "last_updated": "2025-08-19T01:54:27.732Z",
   "source": "Federal Reserve Demo",
   "rate_history": [
     {
@@ -21,13 +21,6 @@
       "change_bps": 50,
       "change_pct": 12.5,
       "note": "Triggers smart contract compensation"
-    },
-    {
-      "rate": 4.75,
-      "date": "2025-08-18T21:01:00.000Z",
-      "change_bps": 25,
-      "change_pct": "5.56",
-      "note": "Rate increase - below trigger threshold"
     }
   ],
   "oracle_metadata": {
